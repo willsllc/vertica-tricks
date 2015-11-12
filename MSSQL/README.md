@@ -1,0 +1,1 @@
+Contains various little utilities and tools for importing data from Microsoft SQL Server (MSSQL) into Vertica.
