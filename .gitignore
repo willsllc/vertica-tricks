@@ -1,6 +1,7 @@
 #MSSQL
 MSSQL/schema.csv
 MSSQL/schema.sql
+MSSQL/tables.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
