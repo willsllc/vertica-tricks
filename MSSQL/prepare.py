@@ -42,7 +42,6 @@ with open(args.filename, 'rb') as f:
 schema = ''     # will hold a big SQL string with CREATE TABLE statements for each table
 tables = []     # will hold a big JSON array with metadata about each table
 for key, group in groupby(filename, lambda x: x[0] + '.' + x[1]):
-    print key
     valid_cols = [];
     sql_schema = 'create table ' + key + ' ('
     sql_export = 'select '
@@ -52,7 +51,7 @@ for key, group in groupby(filename, lambda x: x[0] + '.' + x[1]):
             valid_cols.append(col[2])       #append to the array
             sql_import += col[2] + ','      #append to the COPY statement
             #append to the SELECT query
-            sql_export += 'case when ' + col[2] + ' is null then \'NULL\' else cast(' + col[2] + ' as varchar) end as ' + col[2] + ','     
+            sql_export += 'case when ' + col[2] + ' is null then \'NULL\' else quotename(replace(replace(replace(cast(' + col[2] + ' as varchar),char(13),\'<br>\'),char(10),\'<br/>\'),char(34),\'`\'),char(34)) end as ' + col[2] + ','     
             #append to the CREATE query 
             sql_schema +=  '\r\n\t"' + col[2] + '" ' + col[6]   
             if(col[6] == 'varchar'):
@@ -68,7 +67,7 @@ for key, group in groupby(filename, lambda x: x[0] + '.' + x[1]):
     sql_import = sql_import[:-1]
     # close out the statements
     sql_schema += '\r\n); \r\n\r\n'
-    sql_export += 'from ' + key + ';'
+    sql_export += ' from ' + key + ';'
     sql_import += ') from @file delimited \',\' enclosed by "" null \'NULL\' on error abort direct;'
     # append
     schema += sql_schema
@@ -81,5 +80,4 @@ with open(args.schema, 'w+') as f:
 # write the sql to schema output file
 with open(args.tables, 'w+') as f:
     f.write(json.dumps(tables,indent=2))
-    
-print schema
+
